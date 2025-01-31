@@ -10,7 +10,6 @@ package commands;
 import java.awt.Color;
 import entities.Turtle;
 import entities.Window;
-
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
@@ -18,8 +17,8 @@ import javax.swing.JTextArea;
 public class CommandExecutor {
 
     public static void executeCommand(String command, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
-        String[] parts = command.split(" ");
-        
+        String[] parts = command.split("\\s+");
+
         try {
             switch (parts[0]) {
                 case "FORWARD":
@@ -61,11 +60,7 @@ public class CommandExecutor {
                     logArea.append("Pen color set to " + parts[1] + ".\n");
                     break;
                 case "REPEAT":
-                    int times = Integer.parseInt(parts[1]);
-                    String repeatCommand = command.substring(command.indexOf("[") + 1, command.lastIndexOf("]")).trim();
-                    for (int i = 0; i < times; i++) {
-                        executeCommand(repeatCommand, turtle, window, procedures, logArea);
-                    }
+                    executeRepeat(command, turtle, window, procedures, logArea);
                     break;
                 default:
                     logArea.append("Invalid command.\n");
@@ -75,6 +70,38 @@ public class CommandExecutor {
             logArea.append("Error in command: " + command + "\n");
         }
         window.update();
+    }
+
+    private static void executeRepeat(String command, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
+        try {
+            int repeatCount = Integer.parseInt(command.split("\\s+")[1]);
+
+            int startIndex = command.indexOf("[");
+            int endIndex = command.lastIndexOf("]");
+
+            if (startIndex == -1 || endIndex == -1 || startIndex > endIndex) {
+                logArea.append("Error: correct syntax -> REPEAT <num> [command]\n");
+                return;
+            }
+
+            String subCommand = command.substring(startIndex + 1, endIndex).trim();
+
+            if (procedures.containsKey(subCommand)) {
+                logArea.append("Executing REPEAT " + repeatCount + " times procedure: " + subCommand + "\n");
+                for (int i = 0; i < repeatCount; i++) {
+                    executeProcedure(subCommand, procedures, turtle, window, logArea);
+                }
+            } else if (CommandValidator.validateCommand(subCommand, procedures)) {
+                logArea.append("Executing REPEAT " + repeatCount + " times: " + subCommand + "\n");
+                for (int i = 0; i < repeatCount; i++) {
+                    executeCommand(subCommand, turtle, window, procedures, logArea);
+                }
+            } else {
+                logArea.append("Error: invalid command inside REPEAT.\n");
+            }
+        } catch (Exception e) {
+            logArea.append("Error in REPEAT command.\n");
+        }
     }
 
     private static Color getColor(String colorName) {
