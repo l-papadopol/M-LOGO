@@ -5,10 +5,12 @@
  * All rights reserved
  */
 
+package controller;
 import javax.swing.*;
 import commands.CommandExecutor;
 import commands.CommandValidator;
-import entities.Window;
+import commands.ProcedureManager;
+import view.Window;
 import entities.Turtle;
 import java.awt.*;
 import java.util.List;
@@ -17,9 +19,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class Main {
-    private static boolean definingProcedure = false;
-    private static String currentProcedureName = "";
-    private static List<String> currentProcedureCommands = new ArrayList<>();
+    // Replace static procedure state with ProcedureManager
+    private static ProcedureManager procedureManager = new ProcedureManager();
 
     public static void main(String[] args) {
         Map<String, List<String>> procedures = new HashMap<>();
@@ -60,7 +61,7 @@ public class Main {
 
             if (command.isEmpty()) return;
 
-            if (definingProcedure) {
+            if (procedureManager.isDefiningProcedure()) {
                 // We are defining a procedure, so we add commands
                 handleProcedureInput(command, procedures, logArea);
             } else {
@@ -95,7 +96,7 @@ public class Main {
         }
     }
 
-    // Define a procedure wich is a block of commands grouped and labeled so user can
+    // Define a procedure which is a block of commands grouped and labeled so user can
     // reuse it as "building block"
     private static void startProcedureDefinition(String command, JTextArea logArea) {
         String procedureName = command.substring(3).trim();
@@ -103,39 +104,23 @@ public class Main {
             logArea.append("Error: specify a name for the procedure.\n");
             return;
         }
-
-        definingProcedure = true;
-        currentProcedureName = procedureName;
-        currentProcedureCommands.clear();
-
-        logArea.append("Procedure definition '" + procedureName + "' started.\n");
-        logArea.append("Enter commands, type 'END' to finish.\n");
+        procedureManager.startProcedure(procedureName, logArea);
     }
 
     // How a procedure input process is handled? This way here down!
     private static void handleProcedureInput(String command, Map<String, List<String>> procedures, JTextArea logArea) {
         if (command.equals("END")) {
             // Finish the procedure
-            if (currentProcedureCommands.isEmpty()) {
-                logArea.append("Error: the procedure '" + currentProcedureName + "' is empty and was not saved.\n");
-            } else {
-                procedures.put(currentProcedureName, new ArrayList<>(currentProcedureCommands));
-                logArea.append("Procedure '" + currentProcedureName + "' successfully defined.\n");
-            }
-            definingProcedure = false;
-            currentProcedureName = "";
-            currentProcedureCommands.clear();
+            procedureManager.finishProcedure(procedures, logArea);
         } else {
             // Command validation and addition
             if (CommandValidator.validateCommand(command, procedures)) {
-                currentProcedureCommands.add(command);
-                logArea.append("Added to procedure: " + command + "\n");
+                procedureManager.addCommand(command, logArea);
             } else {
                 logArea.append("Invalid command, try again.\n");
             }
         }
     }
-    
     
     // How a procedure is executed? Here the handling of this task!
     private static void executeProcedure(String procedureName, Map<String, List<String>> procedures, Turtle turtle, Window window, JTextArea logArea) {

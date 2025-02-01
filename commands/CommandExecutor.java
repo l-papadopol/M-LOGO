@@ -1,3 +1,4 @@
+
 /*
  * Command Executor
  * it executes commands. a class really self-explaing
@@ -9,7 +10,8 @@ package commands;
 
 import java.awt.Color;
 import entities.Turtle;
-import entities.Window;
+import view.Window;
+
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
@@ -17,101 +19,18 @@ import javax.swing.JTextArea;
 public class CommandExecutor {
 
     public static void executeCommand(String command, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
-        String[] parts = command.split("\\s+");
-
-        try {
-            switch (parts[0]) {
-                case "FORWARD":
-                    int distance = Integer.parseInt(parts[1]);
-                    turtle.moveForward(distance);
-                    logArea.append("Moved forward by " + distance + " units.\n");
-                    break;
-                case "BACK":
-                    distance = Integer.parseInt(parts[1]);
-                    turtle.moveBack(distance);
-                    logArea.append("Moved backward by " + distance + " units.\n");
-                    break;
-                case "RIGHT":
-                    int degrees = Integer.parseInt(parts[1]);
-                    turtle.turnRight(degrees);
-                    logArea.append("Rotated right by " + degrees + " degrees.\n");
-                    break;
-                case "LEFT":
-                    degrees = Integer.parseInt(parts[1]);
-                    turtle.turnLeft(degrees);
-                    logArea.append("Rotated left by " + degrees + " degrees.\n");
-                    break;
-                case "PENUP":
-                    turtle.penUp();
-                    logArea.append("Pen lifted.\n");
-                    break;
-                case "PENDOWN":
-                    turtle.penDown();
-                    logArea.append("Pen lowered.\n");
-                    break;
-                case "THICKNESS":
-                    int thickness = Integer.parseInt(parts[1]);
-                    turtle.setThickness(thickness);
-                    logArea.append("Line thickness set to " + thickness + ".\n");
-                    break;
-                case "SETCOLOR":
-                    Color color = getColor(parts[1]);
-                    turtle.setPenColor(color);
-                    logArea.append("Pen color set to " + parts[1] + ".\n");
-                    break;
-                case "REPEAT":
-                    executeRepeat(command, turtle, window, procedures, logArea);
-                    break;
-                default:
-                    logArea.append("Invalid command.\n");
-                    break;
+        // Use CommandParser to parse the command string into a Command object.
+        Command cmd = CommandParser.parseCommand(command, turtle, procedures, logArea, window);
+        if (cmd != null) {
+            try {
+                cmd.execute();
+            } catch (Exception e) {
+                logArea.append("Error executing command: " + command + "\n");
             }
-        } catch (Exception e) {
-            logArea.append("Error in command: " + command + "\n");
+        } else {
+            logArea.append("Invalid command.\n");
         }
         window.update();
-    }
-
-    private static void executeRepeat(String command, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
-        try {
-            int repeatCount = Integer.parseInt(command.split("\\s+")[1]);
-
-            int startIndex = command.indexOf("[");
-            int endIndex = command.lastIndexOf("]");
-
-            if (startIndex == -1 || endIndex == -1 || startIndex > endIndex) {
-                logArea.append("Error: correct syntax -> REPEAT <num> [command]\n");
-                return;
-            }
-
-            String subCommand = command.substring(startIndex + 1, endIndex).trim();
-
-            if (procedures.containsKey(subCommand)) {
-                logArea.append("Executing REPEAT " + repeatCount + " times procedure: " + subCommand + "\n");
-                for (int i = 0; i < repeatCount; i++) {
-                    executeProcedure(subCommand, procedures, turtle, window, logArea);
-                }
-            } else if (CommandValidator.validateCommand(subCommand, procedures)) {
-                logArea.append("Executing REPEAT " + repeatCount + " times: " + subCommand + "\n");
-                for (int i = 0; i < repeatCount; i++) {
-                    executeCommand(subCommand, turtle, window, procedures, logArea);
-                }
-            } else {
-                logArea.append("Error: invalid command inside REPEAT.\n");
-            }
-        } catch (Exception e) {
-            logArea.append("Error in REPEAT command.\n");
-        }
-    }
-
-    private static Color getColor(String colorName) {
-        switch (colorName.toUpperCase()) {
-            case "RED": return Color.RED;
-            case "GREEN": return Color.GREEN;
-            case "BLUE": return Color.BLUE;
-            case "BLACK": return Color.BLACK;
-            default: return Color.BLACK;
-        }
     }
 
     public static void executeProcedure(String procedureName, Map<String, List<String>> procedures, Turtle turtle, Window window, JTextArea logArea) {
@@ -124,6 +43,16 @@ public class CommandExecutor {
         logArea.append("Executing procedure '" + procedureName + "':\n");
         for (String command : commands) {
             executeCommand(command, turtle, window, procedures, logArea);
+        }
+    }
+    
+    private static Color getColor(String colorName) {
+        switch (colorName.toUpperCase()) {
+            case "RED": return Color.RED;
+            case "GREEN": return Color.GREEN;
+            case "BLUE": return Color.BLUE;
+            case "BLACK": return Color.BLACK;
+            default: return Color.BLACK;
         }
     }
 }
