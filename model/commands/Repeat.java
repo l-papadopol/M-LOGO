@@ -11,24 +11,25 @@
  * (C) 2025 Papadopol Lucian-Ioan 
  * All rights reserved
  */
-package commands;
+package model.commands;
 
-import entities.Turtle;
-import view.Window;
+import view.DrawingArea;
 
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
 
+import model.entities.Turtle;
+
 public class Repeat implements Command {
     private int times;
     private String commandStr;
     private Turtle turtle;
-    private Window window;
+    private DrawingArea window;
     private Map<String, List<String>> procedures;
     private JTextArea logArea;
 
-    public Repeat(int times, String commandStr, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
+    public Repeat(int times, String commandStr, Turtle turtle, DrawingArea window, Map<String, List<String>> procedures, JTextArea logArea) {
         this.times = times;
         this.commandStr = commandStr;
         this.turtle = turtle;

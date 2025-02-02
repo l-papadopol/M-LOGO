@@ -5,8 +5,8 @@
  * All rights reserved
  */
 
-package commands;
-import entities.Turtle;
+package model.commands;
+import model.entities.Turtle;
 
 public class Back implements Command {
     private Turtle turtle;

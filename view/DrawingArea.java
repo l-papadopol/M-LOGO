@@ -1,15 +1,24 @@
-package entities;
+/*
+ * Drawing area
+ * this object is the area where turtle moves and draw stuff
+ *(C) 2025 Papadopol Lucian-Ioan 
+ * All rights reserved
+ */
+
+package view;
+
 import javax.swing.JPanel;
+import model.entities.*;
 import java.awt.*;
 
-public class Window extends JPanel {
+public class DrawingArea extends JPanel {
     private Turtle turtle;
     private static final long serialVersionUID = 1L;
 
     /**
      * Create the panel.
      */
-    public Window(Turtle turtle) {
+    public DrawingArea(Turtle turtle) {
         this.turtle = turtle;
         setPreferredSize(new Dimension(800, 800));
     }

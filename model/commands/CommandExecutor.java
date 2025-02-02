@@ -6,19 +6,19 @@
  * All rights reserved
  */
 
-package commands;
+package model.commands;
 
-import java.awt.Color;
-import entities.Turtle;
-import view.Window;
+import view.DrawingArea;
 
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
 
+import model.entities.Turtle;
+
 public class CommandExecutor {
 
-    public static void executeCommand(String command, Turtle turtle, Window window, Map<String, List<String>> procedures, JTextArea logArea) {
+    public static void executeCommand(String command, Turtle turtle, DrawingArea window, Map<String, List<String>> procedures, JTextArea logArea) {
         // Use CommandParser to parse the command string into a Command object.
         Command cmd = CommandParser.parseCommand(command, turtle, procedures, logArea, window);
         if (cmd != null) {
@@ -33,7 +33,7 @@ public class CommandExecutor {
         window.update();
     }
 
-    public static void executeProcedure(String procedureName, Map<String, List<String>> procedures, Turtle turtle, Window window, JTextArea logArea) {
+    public static void executeProcedure(String procedureName, Map<String, List<String>> procedures, Turtle turtle, DrawingArea window, JTextArea logArea) {
         List<String> commands = procedures.get(procedureName);
         if (commands == null) {
             logArea.append("Error: procedure '" + procedureName + "' not found.\n");
@@ -45,14 +45,5 @@ public class CommandExecutor {
             executeCommand(command, turtle, window, procedures, logArea);
         }
     }
-    
-    private static Color getColor(String colorName) {
-        switch (colorName.toUpperCase()) {
-            case "RED": return Color.RED;
-            case "GREEN": return Color.GREEN;
-            case "BLUE": return Color.BLUE;
-            case "BLACK": return Color.BLACK;
-            default: return Color.BLACK;
-        }
-    }
+
 }

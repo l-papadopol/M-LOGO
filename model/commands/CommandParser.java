@@ -1,12 +1,13 @@
-package commands;
+package model.commands;
 
-import entities.Turtle;
-import view.Window;
+import view.DrawingArea;
 
 import java.awt.Color;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
+
+import model.entities.Turtle;
 
 /*
  * CommandParser is responsible for parsing a command string and returning
@@ -14,7 +15,7 @@ import javax.swing.JTextArea;
  */
 public class CommandParser {
 
-    public static Command parseCommand(String command, Turtle turtle, Map<String, List<String>> procedures, JTextArea logArea, Window window) {
+    public static Command parseCommand(String command, Turtle turtle, Map<String, List<String>> procedures, JTextArea logArea, DrawingArea window) {
         // Remove extra spaces and assume the command is already in uppercase.
         command = command.trim();
         String[] parts = command.split("\\s+");
