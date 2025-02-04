@@ -49,7 +49,7 @@ The entire project will be developed by Papadopol Lucian Ioan, personally handli
 
 The initial modeling stage of the class diagram is as follows. Of course, it may change during the software development cycle, but the choice of an MVC design pattern is already established, and the overall structure should remain consistent.
 
-![](file:///home/hard/Desktop/class_digram.png?msec=1738653175731)
+![](class_digram.png)
 
 ---
 
