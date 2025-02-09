@@ -19,6 +19,16 @@ import model.entities.Turtle;
 public class CommandExecutor {
 
     public static void executeCommand(String command, Turtle turtle, DrawingArea window, Map<String, List<String>> procedures, JTextArea logArea) {
+    	// If it's a procedure, execute procedure
+    	if (procedures.containsKey(command)) {
+            logArea.append("Executing procedure: " + command + "\\n");
+            for (String subCommand : procedures.get(command)) {
+                executeCommand(subCommand, turtle, window, procedures, logArea);
+            }
+            window.update();
+            return; // Non continuare con la logica normale
+        }
+
         // Use CommandParser to parse the command string into a Command object.
         Command cmd = CommandParser.parseCommand(command, turtle, procedures, logArea, window);
         if (cmd != null) {

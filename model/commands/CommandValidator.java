@@ -29,6 +29,12 @@ public class CommandValidator {
             return false;  // Empty command
         }
         
+        // Verify if it's a procedure 
+        if (procedures.containsKey(parts[0])) {
+            return true;
+        }
+
+        
         switch (parts[0]) {
             case "FORWARD":
             case "BACK":
